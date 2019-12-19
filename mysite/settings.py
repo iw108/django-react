@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # local
-    'project_management'
+    'project_management',
+    'frontend',
 ]
 
 MIDDLEWARE = [
