@@ -12,7 +12,7 @@ python manage.py startapp frontend
 
 Make directory for React and static components:
 ```
-mkdir -p ./frontend/src/components ```
+mkdir -p ./frontend/src/components
 mkdir -p ./frontend/{static,templates}/frontend
 ```
 
@@ -84,10 +84,12 @@ module.exports = {
 Now, go to the ```package.json ``` file and change the ```scripts``` so that it reads:
 ```json
   "scripts" : {
-    "dev": "webpack --mode development ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
-    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
+    "dev": "webpack --mode development --watch ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
+    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js"
   },
 ```
+The ``` --watch ``` flag for development means that you don't have to keep transpiling the js when you make changes
+during development
 
 ###
  
@@ -95,7 +97,7 @@ Now make the following file:
 - ``` touch frontend/src/index.js```
 The file should contain the following:
 ```javascript
-import App from '.components/App';
+import App from './components/App';
 ```
 
 Now make the following file:
@@ -116,6 +118,17 @@ to work.
 
 Create a view in ```frontend/views.py``` that utilizes  the newly made template and incorporate this view
 as per standard Django.  
+
+### Getting everything running
+Transpile the javascript:
+```javascript
+npm run dev
+```
+
+Then run the django server
+```
+python manage.py runserver
+```
 
 ### Recommended reading
 https://www.valentinog.com/blog/drf/
