@@ -3,7 +3,8 @@
 An attempt to combine django and react
 
 
-### Setting up the front end app
+### Step by Step Guide for creating a react django app
+
 ### 1: Create a new app and implementing the basic architecture
 First, create a new app to house the react front end:
 ```
@@ -44,6 +45,7 @@ Now for react:
 ``` 
 npm i react react-dom prop-types 
 ```
+```prop-types``` is used within react for checking the property types.
 
 ### 3: Configuring things
 
@@ -113,8 +115,8 @@ We need to make a template for react to render in, i.e:
 touch frontend/templates/frontend/index.html  
 ```
 A boilerplate can be used to create a generic HTML5 template. This template will be rendered by 
-Django therefore you can use template tags etc. a ```div``` with an id needs to be included for React 
-to work. 
+Django, therefore you can use template tags. A ```div``` with an id needs to be included for React 
+to work. Add Js and Css links for bootstrap here if you are using that. 
 
 Create a view in ```frontend/views.py``` that utilizes  the newly made template and incorporate this view
 as per standard Django.  
