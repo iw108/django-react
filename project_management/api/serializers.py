@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from ..models import Organization, Project
+from ..models import File, Organization, Project
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -16,3 +16,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = '__all__'
+
+
+class FileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = File
+        fields = "__all__"

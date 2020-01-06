@@ -4,19 +4,19 @@ import ReactDOM from 'react-dom';
 import DataProvider from "./DataProvider";
 import Table from "./Table";
 import Form from "./Form";
+import './App.css';
+
+import Basic from "./my-dropzone";
 
 
 const App = () => (
-    <React.Fragment>
-    <div className={"container"}>
-    <DataProvider
-        endpoint="/api/organizations/"
-        render={data => <Table data={data} />}
-    />
-    <Form endpoint={"api/organizations/"}/>
+  <div className="App">
+    <div className="container">
+      <div className={"card card-body"}>
+        <Basic />
+      </div>
     </div>
-    </React.Fragment>
-
-)
+  </div>
+);
 
 ReactDOM.render(<App />, document.getElementById('app'));

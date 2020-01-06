@@ -1,0 +1,23 @@
+
+.App {
+  text-align: left;
+  padding-top: .5rem;
+}
+
+.dropzone {
+  display: flex;
+}
+
+.img-container {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f6f8fa;
+  border-style: dashed;
+  border-color: lightgray;
+}
+.customTable {
+  height:150px;
+}

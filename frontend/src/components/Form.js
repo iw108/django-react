@@ -27,7 +27,6 @@ class Form extends Component {
 
     fetch(this.props.endpoint, conf)
         .then(response => {
-          console.log(response)
           this.setState({'name': ""})});
   };
 
