@@ -31,9 +31,13 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
+    "react-bootstrap": "^1.0.0-beta.16",
     "react-dom": "^16.12.0",
-    "react-dropzone": "^10.2.1"
+    "react-dropzone": "^10.2.1",
+    "tus-js-client": "^1.8.0",
+    "uuid": "^3.3.3"
   }
 }

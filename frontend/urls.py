@@ -10,4 +10,16 @@ urlpatterns = [
         views.index,
         name='index',
     ),
+    path(
+        'upload/',
+        views.CustomTusUpload.as_view(),
+        name='upload',
+    ),
+    path(
+        'upload/<slug:resource_id>',
+        views.CustomTusUpload.as_view(),
+        name='tus_upload_chunks',
+    ),
+
 ]
+

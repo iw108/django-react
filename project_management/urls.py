@@ -5,7 +5,6 @@ from rest_framework import routers
 
 from .api.views import OrganizationViewSet, ProjectViewSet, FileViewSet
 
-
 app_name = 'project_management'
 
 router = routers.DefaultRouter()
