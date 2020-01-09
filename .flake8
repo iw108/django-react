@@ -1,0 +1,20 @@
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    __init__.py,
+    migrations,
+    sites_migrations,
+    manage.py,
+    apps.py,
+    media,
+    settings,
+
+##
+## According to McCabe, anything that goes beyond 10 is too complex.
+##
+max-complexity = 10
+
+max-line-length = 100
+
+application-import-names = secura, sfe

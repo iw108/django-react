@@ -2,9 +2,8 @@
 import React, { Component } from 'react';
 import { Upload } from "tus-js-client";
 
-import ProgressBar from 'react-bootstrap/ProgressBar'
-
-import Dropzone from 'react-dropzone'
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import Dropzone from 'react-dropzone';
 
 const uuid = require('uuid/v4');
 
@@ -13,6 +12,7 @@ class Basic extends Component {
 
   state = {
     fileList: [],
+    formId: 'hellllo',
   };
 
   handleSuccess (fileIndex) {
@@ -51,14 +51,19 @@ class Basic extends Component {
 
   handleUpload(file) {
     // ensure that file has
+    const {formId} = this.state;
+
+    console.log(file);
+
     let index = uuid();
 
     let upload = new Upload(file, {
         endpoint: "/upload/",
+        chunkSize: 2000000,
         metadata: {
-          formId: 'test',
+          formId: formId,
           filename: file.name,
-          filetype: file.type
+          // filetype: file.type || 'unknown',
         },
         onError: (error) => {
           console.log(error);
@@ -143,10 +148,20 @@ class Basic extends Component {
             </Dropzone>
           </div>
 
-          {fileList && (
+
             <div className={"col-10"}>
-              <div style={{height:'200px', 'overflowY': 'auto'}}>
+              <div style={{height:'400px', 'overflowY': 'auto'}}>
                 <table className={"table"}>
+                  {fileList.length > 0 && (
+                    <thead>
+                      <tr>
+                       <th></th>
+                       <th></th>
+                       <th> delete all </th>
+                      </tr>
+                    </thead>
+                  )}
+
                   <tbody>
                     {fileList.map(file => (
                       <tr key={file.index}>
@@ -168,7 +183,7 @@ class Basic extends Component {
                 </table>
               </div>
             </div>
-            )}
+
         </div>
       </div>
     )
