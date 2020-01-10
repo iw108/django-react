@@ -1,62 +1,171 @@
+
 import React, { Component } from "react";
-import PropTypes from "prop-types";
+
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
+import FileDropZone from "./Dropzone";
+import FileTable from "./Table";
 
 
-class Form extends Component {
-  static propTypes = {
-    endpoint: PropTypes.string.isRequired
-  };
+const uuid = require('uuid/v4');
+
+
+const formSchema = Yup.object().shape({
+  description: Yup.string()
+    .max(10)
+    .required('This field is required'),
+});
+
+
+const initialValues = {
+  description: ""
+};
+
+
+class FileForm extends React.Component {
 
   state = {
-    name: ""
+    fileList: [],
+    formId: uuid(),
   };
 
-  handleChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
+  constructor (props) {
+    super(props);
 
-  handleSubmit = e => {
-    e.preventDefault();
-    const { name } = this.state;
-    const organization = { name };
-    const conf = {
-      method: "post",
-      body: JSON.stringify(organization),
-      headers: new Headers({ "Content-Type": "application/json" })
-    };
+    this.handleDrop = this.handleDrop.bind(this);
+    this.handleUploadSuccess = this.handleUploadSuccess.bind(this);
+    this.handleUploadProgress = this.handleUploadProgress.bind(this);
+    this.handleFileDelete = this.handleFileDelete.bind(this)
 
-    fetch(this.props.endpoint, conf)
-        .then(response => {
-          this.setState({'name': ""})});
-  };
+  }
 
-  render() {
-    const { name } = this.state;
+  handleUploadSuccess (fileIndex) {
+
+    this.setState((prevState) => {
+      let fileList = prevState.fileList.map(file => {
+        if (file.index === fileIndex) {
+          file.success = true;
+          file.progress = 100;
+        }
+        return file;
+      });
+
+      return {
+        ...prevState,
+        fileList: fileList,
+      };
+    })
+  }
+
+  handleUploadProgress (bytesUploaded, bytesTotal, fileIndex) {
+
+    let percentage = (bytesUploaded / bytesTotal * 100).toFixed(0);
+    this.setState((prevState) => {
+      let fileList = prevState.fileList.map(file => {
+        if (file.index === fileIndex) {
+          file.progress = percentage;
+        }
+        return file;
+      });
+      return {
+        ...prevState,
+        fileList: fileList,
+      };
+    })
+  }
+
+  handleDrop (fileList) {
+    this.setState(prevState => {
+      return {
+        fileList: prevState.fileList.concat(fileList)
+      }
+    });
+  }
+
+  handleFileDelete (inputIndex) {
+      this.setState(prevState => ({
+          ...prevState,
+          fileList: prevState.fileList.filter(({index}) => (index !== inputIndex))
+        })
+      )
+  }
+
+  render () {
+
+    const { fileList } = this.state;
+
     return (
-      <div className="card card-body">
-        <h2> Create Organization </h2>
-        <form onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="organizationName">Name</label>
-            <input
-              className="form-control"
-              id="organizationName"
-              type="text"
-              name="name"
-              placeholder="Enter a name"
-              onChange={this.handleChange}
-              value={name}
-              required
-            />
-          </div>
+      <Formik
+        validationSchema={formSchema}
+        onSubmit={values => {
+          console.log(values);
+        }}
+        initialValues={initialValues}
+      >
+        {({
+            handleSubmit,
+            handleChange,
+            handleBlur,
+            values,
+            touched,
+            errors,
+          }) => (
 
-          <button type="submit" className="btn btn-primary">
-           Submit
-          </button>
-        </form>
-      </div>
+          <Form noValidate onSubmit={handleSubmit}>
+
+            <Form.Group controlId="formDescription">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                type="text"
+                name="description"
+                value={values.description}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                isValid={touched.description && !errors.description}
+                isInvalid={touched.description && errors.description}
+                placeholder="Description"/>
+              <Form.Control.Feedback type="invalid">
+                {errors.description}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <div className={"card card-body"}>
+              <div className={"container"}>
+                <div className={"row"}>
+                  <div className="col-2">
+                    <FileDropZone
+                      multiple={true}
+                      handleDrop={this.handleDrop}
+                      handleUploadProgress={this.handleUploadProgress}
+                      handleUploadSuccess={this.handleUploadSuccess}
+                    />
+                  </div>
+
+                  <div className={"col-10"}>
+                    <div style={{height:'400px', 'overflowY': 'auto'}}>
+                      <FileTable
+                        fileList={fileList}
+                        handleFileDelete={this.handleFileDelete}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Button variant="primary" type="submit">
+              Submit
+            </Button>
+          </Form>
+        )}
+      </Formik>
     );
   }
-}
+};
 
-export default Form;
+
+export default FileForm;

@@ -18,6 +18,11 @@
   border-style: dashed;
   border-color: lightgray;
 }
+
 .customTable {
   height:150px;
+}
+
+.card {
+margin-bottom: 1rem
 }
