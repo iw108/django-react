@@ -26,3 +26,10 @@
 .card {
 margin-bottom: 1rem
 }
+
+.invalid {
+  width: 100%;
+  margin-top: .25rem;
+  font-size: 80%;
+  color: #dc3545;
+}

@@ -1,13 +1,27 @@
 
 import React, { Component } from 'react';
-
+import PropTypes from "prop-types";
 import Dropzone from 'react-dropzone';
 import {Upload} from "tus-js-client";
+
+
 
 const uuid = require('uuid/v4');
 
 
 class FileDropZone extends Component {
+
+  static propTypes = {
+    handleDrop: PropTypes.func.isRequired,
+    handleUploadProgress: PropTypes.func.isRequired,
+    handleUploadSuccess: PropTypes.func.isRequired,
+    multiple: PropTypes.bool.isRequired,
+  };
+
+  static defaultProps ={
+    multiple: true,
+  };
+
 
   constructor(props) {
     super(props);
@@ -62,7 +76,6 @@ class FileDropZone extends Component {
   }
 
   render() {
-
     const styleProps = {
       className: 'dropzone'
     };
@@ -83,7 +96,7 @@ class FileDropZone extends Component {
         )}
       </Dropzone>
     )
-    }
+  }
 }
 
 export default FileDropZone;

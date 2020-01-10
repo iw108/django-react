@@ -18,11 +18,16 @@ const formSchema = Yup.object().shape({
   description: Yup.string()
     .max(10)
     .required('This field is required'),
+  uploads: Yup.number()
+    .min(1, "Please upload a file")
+    .max(3)
+    .required('Please upload a file')
 });
 
 
 const initialValues = {
-  description: ""
+  description: "",
+  uploads: 0,
 };
 
 
@@ -110,6 +115,7 @@ class FileForm extends React.Component {
             handleSubmit,
             handleChange,
             handleBlur,
+            setFieldValue,
             values,
             touched,
             errors,
@@ -133,31 +139,45 @@ class FileForm extends React.Component {
               </Form.Control.Feedback>
             </Form.Group>
 
-            <div className={"card card-body"}>
-              <div className={"container"}>
-                <div className={"row"}>
-                  <div className="col-2">
-                    <FileDropZone
-                      multiple={true}
-                      handleDrop={this.handleDrop}
-                      handleUploadProgress={this.handleUploadProgress}
-                      handleUploadSuccess={this.handleUploadSuccess}
-                    />
-                  </div>
+            <Form.Group controlId={"formUpload"}>
+              <Form.Label> Uploads </Form.Label>
+                <div className={"card card-body"}>
+                  <div className={"container"}>
+                    <div className={"row"}>
+                      <div className="col-2">
+                        <FileDropZone
+                          multiple={true}
+                          handleDrop={this.handleDrop}
+                          handleUploadProgress={this.handleUploadProgress}
+                          handleUploadSuccess={(fileIndex) => {
+                            this.handleUploadSuccess(fileIndex);
+                            setFieldValue('uploads', values.uploads + 1);
+                          }}
+                        />
+                      </div>
 
-                  <div className={"col-10"}>
-                    <div style={{height:'400px', 'overflowY': 'auto'}}>
-                      <FileTable
-                        fileList={fileList}
-                        handleFileDelete={this.handleFileDelete}
-                      />
+                      <div className={"col-10"}>
+                        <div style={{height:'400px', 'overflowY': 'auto'}}>
+                          <FileTable
+                            fileList={fileList}
+                            handleFileDelete={(fileIndex) =>{
+                              this.handleFileDelete(fileIndex);
+                              setFieldValue('uploads', values.uploads - 1);
+                            }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              <div className={"invalid"}>{touched.uploads && errors.uploads}</div>
+            </Form.Group>
 
-            <Button variant="primary" type="submit">
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={fileList.filter(({progress}) => (progress < 100)).length > 0}
+            >
               Submit
             </Button>
           </Form>

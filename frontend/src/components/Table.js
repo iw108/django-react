@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import PropTypes from "prop-types";
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
 
@@ -103,5 +104,11 @@ function Table (props) {
     </table>
   )
 }
+
+Table.propTypes = {
+  fileList: PropTypes.array.isRequired,
+  handleFileDelete: PropTypes.func.isRequired
+};
+
 
 export default Table;
