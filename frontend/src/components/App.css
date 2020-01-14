@@ -4,23 +4,30 @@
   padding-top: .5rem;
 }
 
-.dropzone {
-  /*align-items: center;*/
-  /*text-align: center;*/
-  display: flex;
-}
-
 .img-container {
   width: 200px;
-  height: 200px;
+  height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f6f8fa;
-  border-style: dashed;
-  border-color: lightgray;
-  margin-bottom: 1rem
+  /*background-color: #f6f8fa;*/
+  /*border-style: dashed;*/
+  /*border-color: lightgray;*/
+  margin-bottom: 1rem;
 }
+
+figure {
+  width: 150px;
+  height: 120px;
+  text-align: center;
+  margin: auto;
+  vertical-align: middle;
+}
+
+img {
+vertical-align: middle;
+}
+
 
 .customTable {
   height:150px;

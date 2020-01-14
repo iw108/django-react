@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+
 import PropTypes from "prop-types";
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
@@ -74,7 +75,7 @@ function FileRow (props) {
 
 function Table (props) {
 
-  const {fileList, handleFileDelete} = props;
+  const {fileList, handleUploadDelete} = props;
 
   return (
     <table className={"table"}>
@@ -95,7 +96,7 @@ function Table (props) {
               name={file.upload.file.path}
               progress={file.progress}
               url={file.upload.url}
-              handleDelete={handleFileDelete}
+              handleDelete={handleUploadDelete}
             />
           </tr>
           )
@@ -107,7 +108,7 @@ function Table (props) {
 
 Table.propTypes = {
   fileList: PropTypes.array.isRequired,
-  handleFileDelete: PropTypes.func.isRequired
+  handleUploadDelete: PropTypes.func.isRequired
 };
 
 

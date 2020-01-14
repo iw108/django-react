@@ -5,14 +5,11 @@ import axios from "axios";
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Form from 'react-bootstrap/Form';
+import {v4 as uuid} from 'uuid';
 import Button from 'react-bootstrap/Button';
 
-import FileDropZone from "./Dropzone";
-import FileTable from "./Table";
-
+import Uploader from './Uploader';
 import AlertDismissible from "./Alert";
-
-const uuid = require('uuid/v4');
 
 
 const formSchema = Yup.object().shape({
@@ -63,7 +60,7 @@ class FileForm extends React.Component {
     this.handleDrop = this.handleDrop.bind(this);
     this.handleUploadSuccess = this.handleUploadSuccess.bind(this);
     this.handleUploadProgress = this.handleUploadProgress.bind(this);
-    this.handleFileDelete = this.handleFileDelete.bind(this);
+    this.handleUploadDelete = this.handleUploadDelete.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 
   }
@@ -110,7 +107,7 @@ class FileForm extends React.Component {
     });
   }
 
-  handleFileDelete (inputIndex) {
+  handleUploadDelete (inputIndex) {
       this.setState(prevState => ({
           ...prevState,
           fileList: prevState.fileList.filter(({index}) => (index !== inputIndex))
@@ -129,8 +126,7 @@ class FileForm extends React.Component {
         "/api/file-form/",
         data,
       )
-      .then(resp => {
-
+      .then(() => {
         resetForm(getInitialValues());
         this.setState(prevState => {
           return {
@@ -147,7 +143,6 @@ class FileForm extends React.Component {
         console.log('Something went wrong', err.response.data)
       })
   }
-
 
   render () {
 
@@ -166,14 +161,12 @@ class FileForm extends React.Component {
             handleBlur,
             setFieldValue,
             values,
-            initialValues,
+            initialValues: {formId},
             touched,
             errors,
           }) => (
 
           <Form noValidate onSubmit={handleSubmit}>
-
-            {console.log(initialValues)}
 
             {message.status && (
               <AlertDismissible
@@ -200,32 +193,15 @@ class FileForm extends React.Component {
             <Form.Group controlId={"formUpload"}>
               <Form.Label> Uploads </Form.Label>
                 <div className={"card card-body"}>
-                  <div className={"container"}>
-                    <div className={"row justify-content-center"}>
-                        <FileDropZone
-                          multiple={true}
-                          formId={initialValues.formId}
-                          handleDrop={this.handleDrop}
-                          handleUploadProgress={this.handleUploadProgress}
-                          handleUploadSuccess={(fileIndex) => {
-                            this.handleUploadSuccess(fileIndex);
-                            setFieldValue('uploadCount', values.uploadCount + 1);
-                          }}
-                        />
-                    </div>
-
-                    <div className={"row"}>
-                      <div className={"col-12"}>
-                          <FileTable
-                            fileList={fileList}
-                            handleFileDelete={(fileIndex) =>{
-                              this.handleFileDelete(fileIndex);
-                              setFieldValue('uploadCount', values.uploadCount - 1);
-                            }}
-                          />
-                      </div>
-                    </div>
-                  </div>
+                  <Uploader
+                    multiple={true}
+                    formId={formId}
+                    handleDrop={this.handleDrop}
+                    handleUploadProgress={this.handleUploadProgress}
+                    handleUploadSuccess={this.handleUploadSuccess}
+                    handleUploadDelete={this.handleUploadDelete}
+                    fileList={fileList}
+                  />
                 </div>
               <div className={"invalid"}>{touched.uploadCount && errors.uploadCount}</div>
             </Form.Group>
@@ -233,6 +209,7 @@ class FileForm extends React.Component {
             <Button
               variant="primary"
               type="submit"
+              onClick={() => setFieldValue('uploadCount', fileList.length)}
               disabled={fileList.filter(({progress}) => (progress < 100)).length > 0}
             >
               Submit
@@ -243,6 +220,5 @@ class FileForm extends React.Component {
     );
   }
 }
-
 
 export default FileForm;

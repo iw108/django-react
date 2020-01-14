@@ -1,12 +1,10 @@
 
 import React, { Component } from 'react';
+
 import PropTypes from "prop-types";
 import Dropzone from 'react-dropzone';
 import {Upload} from "tus-js-client";
-
-
-
-const uuid = require('uuid/v4');
+import {v4 as uuid} from 'uuid'
 
 
 class FileDropZone extends Component {
@@ -70,21 +68,21 @@ class FileDropZone extends Component {
   }
 
   render() {
-    const styleProps = {
-      className: 'dropzone'
-    };
 
     return (
       <Dropzone multiple={this.props.multiple} onDrop={this._handleDrop}>
         {({getRootProps, getInputProps}) => (
-          <div {...getRootProps(styleProps)}>
+          <div {...getRootProps()}>
             <input {...getInputProps()}/>
             <div className={"img-container"}>
-              <img
-                alt="upload cloud"
-                src={"static/cloud-upload-thin.svg"}
-                width="50%"
-              />
+              <figure>
+                <img
+                  alt="upload cloud"
+                  src={"static/cloud-upload-thin.svg"}
+                  width="40%"
+                />
+                <figcaption> Drop your files or click here</figcaption>
+              </figure>
             </div>
           </div>
         )}
