@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import Dropzone from 'react-dropzone';
 import {Upload} from "tus-js-client";
 import {v4 as uuid} from 'uuid'
-
+import ControlPointIcon from '@material-ui/icons/ControlPoint'
 
 class FileDropZone extends Component {
 
@@ -69,18 +69,18 @@ class FileDropZone extends Component {
 
   render() {
 
+    const customStyle = {
+      className:'dropzone',
+    };
+
     return (
       <Dropzone multiple={this.props.multiple} onDrop={this._handleDrop}>
         {({getRootProps, getInputProps}) => (
-          <div {...getRootProps()}>
+          <div {...getRootProps(customStyle)}>
             <input {...getInputProps()}/>
             <div className={"img-container"}>
               <figure>
-                <img
-                  alt="upload cloud"
-                  src={"static/cloud-upload-thin.svg"}
-                  width="40%"
-                />
+                <ControlPointIcon fontSize={"large"}/>
                 <figcaption> Drop your files or click here</figcaption>
               </figure>
             </div>

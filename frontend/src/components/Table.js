@@ -2,7 +2,11 @@
 import React, { Component } from 'react';
 
 import PropTypes from "prop-types";
-import ProgressBar from 'react-bootstrap/ProgressBar';
+import { Button, CircularProgress } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import ClearIcon from '@material-ui/icons/Clear';
+import Tooltip from '@material-ui/core/Tooltip';
+
 
 
 class DeleteButton extends Component {
@@ -34,20 +38,40 @@ class DeleteButton extends Component {
 
   render() {
     return (
-      <button
+      <IconButton
+        aria-label="delete"
         onClick={this.handleClick}
-        className="btn btn-danger btn-sm"
-        type={"button"}
+        size={"small"}
       >
-        Delete
-      </button>
+        <ClearIcon />
+      </IconButton>
     )
   }
 }
 
-function UploadProgress (props) {
+
+function DeleteAll() {
   return (
-    <ProgressBar style={{width:"200px"}} now={props.progress} />
+    <Tooltip title="Delete all">
+      <IconButton
+        aria-label="delete"
+        size={"medium"}
+      >
+        <ClearIcon />
+      </IconButton>
+    </Tooltip>
+  )
+}
+
+
+function UploadProgress (props) {
+
+  return (
+    <CircularProgress
+      size={24}
+      variant={"static"}
+      value={parseInt(props.progress)}
+    />
   )
 }
 
@@ -58,9 +82,7 @@ function FileRow (props) {
   return (
     <React.Fragment>
       <td>{name}</td>
-      <td>
-        <UploadProgress progress={progress}/>
-      </td>
+
       {progress === 100 && (
         <td>
           <DeleteButton
@@ -68,10 +90,19 @@ function FileRow (props) {
             url={url}
             handleDelete={handleDelete} />
         </td>
-        )}
+      )}
+      {progress !== 100 && (
+        <td>
+          <UploadProgress
+            progress={progress}
+          />
+        </td>
+      )}
+
     </React.Fragment>
   )
 }
+
 
 function Table (props) {
 
@@ -79,14 +110,16 @@ function Table (props) {
 
   return (
     <table className={"table"}>
-      {fileList.length > 0 && (
-        <thead>
-          <tr>
-           <th colSpan={2}/>
-           <th> delete all </th>
-          </tr>
-        </thead>
-      )}
+      {/*{fileList.length > 0 && (*/}
+      {/*  <thead>*/}
+      {/*    <tr>*/}
+      {/*     <th />*/}
+      {/*     <th >*/}
+      {/*       <DeleteAll />*/}
+      {/*     </th>*/}
+      {/*    </tr>*/}
+      {/*  </thead>*/}
+      {/*)}*/}
 
       <tbody>
         {fileList.map(file => (

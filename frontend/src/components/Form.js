@@ -1,15 +1,17 @@
 
-import React, { Component } from "react";
+import React from "react";
 
 import axios from "axios";
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import Form from 'react-bootstrap/Form';
+
 import {v4 as uuid} from 'uuid';
-import Button from 'react-bootstrap/Button';
+
+import { withStyles } from '@material-ui/core/styles';
+import { FormControl, TextField, Button} from '@material-ui/core';
+
 
 import Uploader from './Uploader';
-import AlertDismissible from "./Alert";
 
 
 const formSchema = Yup.object().shape({
@@ -42,6 +44,19 @@ const getInitialValues = () => ({
   description: "",
   uploadCount: 0,
 });
+
+
+const styles = theme => ({
+  root: {
+    '& .MuiTextField-root': {
+      width: 400,
+    },
+    '& > *': {
+      margin: theme.spacing(2),
+    },
+  },
+});
+
 
 
 class FileForm extends React.Component {
@@ -148,13 +163,14 @@ class FileForm extends React.Component {
 
     const { fileList, message } = this.state;
 
+    const { classes } = this.props;
+
     return (
       <Formik
         validationSchema={formSchema}
         onSubmit={this.handleSubmit}
         initialValues={getInitialValues()}
       >
-
         {({
             handleSubmit,
             handleChange,
@@ -165,60 +181,61 @@ class FileForm extends React.Component {
             touched,
             errors,
           }) => (
+          <form className={classes.root} noValidate onSubmit={handleSubmit}>
 
-          <Form noValidate onSubmit={handleSubmit}>
+            {/*{message.status && (*/}
+            {/*  <AlertDismissible*/}
+            {/*    status={message.status}*/}
+            {/*    message={message.message}*/}
+            {/*  />*/}
+            {/*)}*/}
 
-            {message.status && (
-              <AlertDismissible
-                status={message.status}
-                message={message.message}
-              />
-            )}
-
-            <Form.Group controlId="formDescription">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                type="text"
+            <div>
+              <TextField
+                error={(touched.description && errors.description)}
                 name="description"
                 value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                isInvalid={touched.description && errors.description}
-                placeholder="Description"/>
-              <Form.Control.Feedback type="invalid">
-                {errors.description}
-              </Form.Control.Feedback>
-            </Form.Group>
+                variant={"outlined"}
+                label="Description"
+                required
+              />
+            </div>
 
-            <Form.Group controlId={"formUpload"}>
-              <Form.Label> Uploads </Form.Label>
-                <div className={"card card-body"}>
-                  <Uploader
-                    multiple={true}
-                    formId={formId}
-                    handleDrop={this.handleDrop}
-                    handleUploadProgress={this.handleUploadProgress}
-                    handleUploadSuccess={this.handleUploadSuccess}
-                    handleUploadDelete={this.handleUploadDelete}
-                    fileList={fileList}
-                  />
-                </div>
-              <div className={"invalid"}>{touched.uploadCount && errors.uploadCount}</div>
-            </Form.Group>
+            <div>
+              <FormControl>
+                <div className="card card-body">
+                    <Uploader
+                      multiple={true}
+                      formId={formId}
+                      handleDrop={this.handleDrop}
+                      handleUploadProgress={this.handleUploadProgress}
+                      handleUploadSuccess={this.handleUploadSuccess}
+                      handleUploadDelete={this.handleUploadDelete}
+                      fileList={fileList}
+                    />
+                  </div>
+                {/*<div className={"invalid"}>{touched.uploadCount && errors.uploadCount}</div>*/}
+              </FormControl>
+            </div>
 
+          <div>
             <Button
-              variant="primary"
+              variant={"contained"}
+              color="primary"
               type="submit"
               onClick={() => setFieldValue('uploadCount', fileList.length)}
               disabled={fileList.filter(({progress}) => (progress < 100)).length > 0}
             >
               Submit
             </Button>
-          </Form>
+          </div>
+          </form>
         )}
       </Formik>
     );
   }
 }
 
-export default FileForm;
+export default withStyles(styles)(FileForm);
