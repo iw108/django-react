@@ -3,14 +3,13 @@ from django.urls import path, include
 
 from rest_framework import routers
 
-from .api.views import OrganizationViewSet, ProjectViewSet, FileViewSet
+from .api.views import FileMetaViewSet, FileViewSet
 
-app_name = 'project_management'
+app_name = 'file_management'
 
 router = routers.DefaultRouter()
-router.register('organizations', OrganizationViewSet)
-router.register('projects', ProjectViewSet)
 router.register('files', FileViewSet)
+router.register('file-form', FileMetaViewSet)
 
 
 urlpatterns = [

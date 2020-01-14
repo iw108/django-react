@@ -22,13 +22,8 @@ class FileDropZone extends Component {
     multiple: true,
   };
 
-
   constructor(props) {
     super(props);
-
-    this.state = {
-      formId: uuid(),
-    };
 
     this._handleDrop = this._handleDrop.bind(this);
     this._handleUpload = this._handleUpload.bind(this);
@@ -44,14 +39,13 @@ class FileDropZone extends Component {
   _handleUpload(file) {
     // ensure that file has
 
-    const {formId} = this.state;
     let index = uuid();
 
     let upload = new Upload(file, {
         endpoint: "/upload/",
         chunkSize: 2000000,
         metadata: {
-          formId: formId,
+          formId: this.props.formId,
           filename: file.name,
           // filetype: file.type || 'unknown',
         },

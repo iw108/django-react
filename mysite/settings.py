@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django_file_form',
 
     # local
-    'project_management',
+    'file_management',
     'frontend',
 ]
 

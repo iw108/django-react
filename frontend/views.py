@@ -10,7 +10,8 @@ def index(request):
 
 class CustomTusUpload(TusUpload):
 
-    def post(self, request, *args, **kwargs):
-        upload_metadata = request.META.get("HTTP_UPLOAD_METADATA", None)
-        print(upload_metadata)
-        return super().post(request, *args, **kwargs)
+    def create_uploaded_file_in_db(self, field_name, file_id, form_id, original_filename, uploaded_file):
+
+        print('########################################', form_id)
+
+        return super().create_uploaded_file_in_db(field_name, file_id, form_id, original_filename, uploaded_file)
