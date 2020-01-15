@@ -8,22 +8,22 @@ import * as Yup from 'yup';
 import {v4 as uuid} from 'uuid';
 
 import { withStyles } from '@material-ui/core/styles';
-import { FormControl, TextField, Button} from '@material-ui/core';
+import { FormControl, FormControlLabel, FormGroup, Switch, TextField, Button} from '@material-ui/core';
 
-
-import Uploader from './Uploader';
+import BaseUploader from './Uploader';
 
 
 const formSchema = Yup.object().shape({
   formId: Yup.string()
     .required(),
   description: Yup.string()
-    .max(10)
-    .required('This field is required'),
+    .max(10),
   uploadCount: Yup.number()
     .min(1, "Please upload a file")
     .max(3)
-    .required('Please upload a file')
+    .required('Please upload a file'),
+  encrypt: Yup.boolean(),
+  container: Yup.boolean(),
 });
 
 
@@ -43,6 +43,8 @@ const getInitialValues = () => ({
   formId: uuid(),
   description: "",
   uploadCount: 0,
+  encrypted: false,
+  container: false,
 });
 
 
@@ -59,100 +61,50 @@ const styles = theme => ({
 
 
 
-class FileForm extends React.Component {
+class FileForm extends BaseUploader {
 
   state = {
     fileList: [],
+    formId: uuid(),
+    step: 0,
     message: {
       status: "",
       message: "",
     },
   };
 
-  constructor (props) {
+  constructor(props) {
     super(props);
-
-    this.handleDrop = this.handleDrop.bind(this);
-    this.handleUploadSuccess = this.handleUploadSuccess.bind(this);
-    this.handleUploadProgress = this.handleUploadProgress.bind(this);
-    this.handleUploadDelete = this.handleUploadDelete.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-
-  }
-
-  handleUploadSuccess (fileIndex) {
-
-    this.setState((prevState) => {
-      let fileList = prevState.fileList.map(file => {
-        if (file.index === fileIndex) {
-          file.success = true;
-          file.progress = 100;
-        }
-        return file;
-      });
-      return {
-        ...prevState,
-        fileList: fileList,
-      };
-    })
-  }
-
-  handleUploadProgress (bytesUploaded, bytesTotal, fileIndex) {
-
-    let percentage = (bytesUploaded / bytesTotal * 100).toFixed(0);
-    this.setState((prevState) => {
-      let fileList = prevState.fileList.map(file => {
-        if (file.index === fileIndex) {
-          file.progress = percentage;
-        }
-        return file;
-      });
-      return {
-        ...prevState,
-        fileList: fileList,
-      };
-    })
-  }
-
-  handleDrop (fileList) {
-    this.setState(prevState => {
-      return {
-        fileList: prevState.fileList.concat(fileList)
-      }
-    });
-  }
-
-  handleUploadDelete (inputIndex) {
-      this.setState(prevState => ({
-          ...prevState,
-          fileList: prevState.fileList.filter(({index}) => (index !== inputIndex))
-        })
-      )
   }
 
   handleSubmit(values, {resetForm}) {
-
     // ensure form data keys are snake cased
     console.log("Submitting data");
 
-    const data = _parseObject(values);
+    const dataToServer = _parseObject({
+      ...values,
+      formId: this.state.formId
+    });
+
     axios
       .post(
         "/api/file-form/",
-        data,
+        dataToServer,
       )
       .then(() => {
         resetForm(getInitialValues());
-        this.setState(prevState => {
-          return {
+        this.setState(prevState => (
+          {
             ...prevState,
+            formId: uuid(),
             fileList: [],
             message: {
               status: 201,
               message: 'success!!!',
             }
           }
-        })
+        ))
       })
       .catch(err => {
         console.log('Something went wrong', err.response.data)
@@ -162,7 +114,6 @@ class FileForm extends React.Component {
   render () {
 
     const { fileList, message } = this.state;
-
     const { classes } = this.props;
 
     return (
@@ -177,18 +128,10 @@ class FileForm extends React.Component {
             handleBlur,
             setFieldValue,
             values,
-            initialValues: {formId},
             touched,
             errors,
           }) => (
           <form className={classes.root} noValidate onSubmit={handleSubmit}>
-
-            {/*{message.status && (*/}
-            {/*  <AlertDismissible*/}
-            {/*    status={message.status}*/}
-            {/*    message={message.message}*/}
-            {/*  />*/}
-            {/*)}*/}
 
             <div>
               <TextField
@@ -198,26 +141,31 @@ class FileForm extends React.Component {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 variant={"outlined"}
-                label="Description"
-                required
+                label="Description of files"
               />
             </div>
 
             <div>
               <FormControl>
-                <div className="card card-body">
-                    <Uploader
-                      multiple={true}
-                      formId={formId}
-                      handleDrop={this.handleDrop}
-                      handleUploadProgress={this.handleUploadProgress}
-                      handleUploadSuccess={this.handleUploadSuccess}
-                      handleUploadDelete={this.handleUploadDelete}
-                      fileList={fileList}
-                    />
-                  </div>
+                {this._renderUploader()}
                 {/*<div className={"invalid"}>{touched.uploadCount && errors.uploadCount}</div>*/}
               </FormControl>
+            </div>
+
+
+            <div>
+             <FormControl component={"fieldset"}>
+               <FormGroup>
+                <FormControlLabel
+                  control={<Switch color="primary" checked={values.encrypted} onChange={() => setFieldValue('encrypted', !values.encrypted)} value="encrypt" />}
+                  label="Encrypt"
+                />
+                <FormControlLabel
+                  control={<Switch color="primary" checked={values.container} onChange={() => setFieldValue('container', !values.container)} value="container" />}
+                  label="Container"
+                />
+               </FormGroup>
+             </FormControl>
             </div>
 
           <div>
