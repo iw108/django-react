@@ -9,6 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 
 
 
+
 class DeleteButton extends Component {
 
   constructor(props) {
@@ -104,11 +105,12 @@ function FileRow (props) {
 }
 
 
-function Table (props) {
+function FileTable (props) {
 
   const {fileList, handleUploadDelete} = props;
 
   return (
+
     <table className={"table"}>
       {/*{fileList.length > 0 && (*/}
       {/*  <thead>*/}
@@ -139,10 +141,10 @@ function Table (props) {
   )
 }
 
-Table.propTypes = {
+FileTable.propTypes = {
   fileList: PropTypes.array.isRequired,
   handleUploadDelete: PropTypes.func.isRequired
 };
 
 
-export default Table;
+export default FileTable;
