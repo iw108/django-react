@@ -26,6 +26,7 @@ const formSchema = Yup.object().shape({
   encrypt: Yup.boolean(),
   container: Yup.boolean(),
   containerName: Yup.string()
+    .max(10),
 });
 
 
@@ -64,11 +65,11 @@ const styles = theme => ({
 
 
 function EncryptionForm (props) {
-  const {values, setValues, handleChange, handleBlur} = props;
+  const {errors, setTouched, touched, values, setValues, handleChange, handleBlur} = props;
   return (
     <React.Fragment>
       <div>
-        <FormControl component={"fieldset"} justify={"center"}>
+        <FormControl component={"fieldset"} label={'qweqwe'}>
           <FormGroup aria-label="position" row >
           <FormControlLabel
             label="Container"
@@ -86,9 +87,11 @@ function EncryptionForm (props) {
                   // encrypted and should not have container name
                   if (!updatedValues.container) {
                     updatedValues.containerName = "";
+                    setTouched({...touched, container: false});
                     updatedValues.encrypted = false;
                   }
                   setValues({...updatedValues});
+
                 }}
               />
             }
@@ -116,14 +119,14 @@ function EncryptionForm (props) {
               />
             }
             />
-
          </FormGroup>
        </FormControl>
       </div>
 
       <div>
         <TextField
-          // error={(touched.description && errors.description)}
+          error={!!(values.container && touched.containerName && errors.containerName)}
+          helperText={touched.containerName && errors.containerName}
           name="containerName"
           value={values.containerName}
           onChange={handleChange}
@@ -313,6 +316,7 @@ class FileForm extends Component {
             handleChange,
             handleBlur,
             setValues,
+            setTouched,
             setFieldValue,
             values,
             touched,
@@ -336,7 +340,8 @@ class FileForm extends Component {
 
                 <div>
                   <TextField
-                    error={(touched.description && errors.description)}
+                    error={!!(touched.description && errors.description)}
+                    helperText={touched.description && errors.description}
                     name="description"
                     value={values.description}
                     onChange={handleChange}
@@ -344,6 +349,9 @@ class FileForm extends Component {
                     variant={"outlined"}
                     label="Description"
                     required
+                    multiline
+                    rowsMax="2"
+                    inputProps={{ maxLength: 128 }}
                   />
                 </div>
 
@@ -367,6 +375,9 @@ class FileForm extends Component {
                   setValues={setValues}
                   handleChange={handleChange}
                   handleBlur={handleBlur}
+                  touched={touched}
+                  errors={errors}
+                  setTouched={setTouched}
                 />
               </div>
 

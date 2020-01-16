@@ -99,7 +99,6 @@ function FileRow (props) {
           />
         </td>
       )}
-
     </React.Fragment>
   )
 }
