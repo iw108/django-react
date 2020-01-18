@@ -1,5 +1,5 @@
 
-import React, { Component } from "react";
+import React, { useEffect, Component } from "react";
 
 import axios from "axios";
 import { Formik } from 'formik';
@@ -42,14 +42,15 @@ const _parseObject = obj => {
   );
 };
 
-const getInitialValues = () => ({
+const getInitialValues = () => {
+  return {
   formId: uuid(),
   description: "",
   uploadCount: 0,
   encrypted: false,
   container: false,
   containerName: "",
-});
+}};
 
 
 const styles = theme => ({
@@ -65,76 +66,90 @@ const styles = theme => ({
 
 
 function EncryptionForm (props) {
-  const {errors, setTouched, touched, values, setValues, handleChange, handleBlur} = props;
+
+  // const [dismissSuggestion, setDismissSuggestion] = useState(false);
+  const {containerRecommended, errors, setTouched, touched, values, setValues, handleChange, handleBlur} = props;
+
+  useEffect(() => {
+    if (containerRecommended) {
+      console.log();
+      setValues('container', true)
+    }
+  });
+
+  const _updateFields = (obj) => {
+    const updatedValues = {
+      ...values,
+      ...obj,
+    };
+
+    if (!updatedValues.container) {
+      updatedValues.containerName = "";
+      if (touched.container) {
+        setTouched({...touched, container: false});
+      }
+    }
+    setValues(updatedValues)
+  };
+
+  const getContainerNameHelpText = () => {
+    const initialHelpText =  "* Name of the " + ((values.encrypted) ? "encrypted": "") + " container";
+    return (touched.containerName && errors.containerName) || initialHelpText
+  };
+
+  const updateContainerSwitch = () => {
+    _updateFields({container: !values.container});
+  };
+
+  const updateEncryptSwitch = () => {
+    _updateFields({encrypted: !values.encrypted});
+  };
+
   return (
     <React.Fragment>
       <div>
-        <FormControl component={"fieldset"} label={'qweqwe'}>
+        <FormControl component={"fieldset"} label={'asdasdasdasd'}>
           <FormGroup aria-label="position" row >
+            <FormControlLabel
+              label="Encrypt"
+              control={
+                <Switch
+                  color="primary"
+                  value="encrypt"
+                  checked={values.encrypted}
+                  onChange={updateEncryptSwitch}
+                />
+              }
+            />
+         </FormGroup>
+
           <FormControlLabel
             label="Container"
             control={
               <Switch
                 color="primary"
                 value="container"
-                checked={values.container}
-                onChange={() => {
-                  let updatedValues = {
-                    ...values,
-                    container: !values.container,
-                  };
-                  // if container not specified, then it should not be
-                  // encrypted and should not have container name
-                  if (!updatedValues.container) {
-                    updatedValues.containerName = "";
-                    setTouched({...touched, container: false});
-                    updatedValues.encrypted = false;
-                  }
-                  setValues({...updatedValues});
-
-                }}
+                disabled={values.encrypted}
+                checked={values.encrypted || values.container}
+                onChange={updateContainerSwitch}
               />
             }
           />
-
-          <FormControlLabel
-            label="Encrypt"
-            control={
-              <Switch
-                color="primary"
-                value="encrypt"
-                checked={values.encrypted}
-                onChange={() => {
-                  let updatedValues = {
-                    ...values,
-                    encrypted: !values.encrypted,
-                  };
-                  // if encrypted specified then it should also
-                  // be a container
-                  if (updatedValues.encrypted) {
-                    updatedValues.container = true;
-                  }
-                  setValues(updatedValues)
-                }}
-              />
-            }
-            />
-         </FormGroup>
        </FormControl>
       </div>
 
       <div>
         <TextField
           error={!!(values.container && touched.containerName && errors.containerName)}
-          helperText={touched.containerName && errors.containerName}
+          helperText={getContainerNameHelpText()}
           name="containerName"
           value={values.containerName}
           onChange={handleChange}
           onBlur={handleBlur}
           variant={"outlined"}
-          label="Container Name"
-          disabled={!values.container}
-          required={values.container}
+          label={"Container name"}
+          disabled={!(values.encrypted || values.container)}
+          required={values.encrypted || values.container}
         />
       </div>
     </React.Fragment>
@@ -146,6 +161,7 @@ class FileForm extends Component {
 
   state = {
     fileList: [],
+    containerRecommended: false,
     formId: uuid(),
     step: 1,
     message: {
@@ -185,7 +201,9 @@ class FileForm extends Component {
 
       this.setState(prevState => {
         return {
-          fileList: prevState.fileList.concat(fileList)
+          ...prevState, 
+          fileList: prevState.fileList.concat(fileList),
+          containerRecommended: prevState.containerRecommended || (fileList.length + prevState.fileList) >= 3,
         }
     });
   }
@@ -301,11 +319,10 @@ class FileForm extends Component {
 
   render () {
 
-    const { fileList, step } = this.state;
+    const { fileList, step, containerRecommended } = this.state;
     const { classes } = this.props;
 
     return (
-
       <Formik
         validationSchema={formSchema}
         onSubmit={this.handleSubmit}
@@ -317,7 +334,6 @@ class FileForm extends Component {
             handleBlur,
             setValues,
             setTouched,
-            setFieldValue,
             values,
             touched,
             errors,
@@ -371,6 +387,7 @@ class FileForm extends Component {
           {/*  <React.Fragment>*/}
               <div>
                 <EncryptionForm
+                  containerRecommended={containerRecommended}
                   values={values}
                   setValues={setValues}
                   handleChange={handleChange}
