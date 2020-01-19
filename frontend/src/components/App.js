@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-import FileForm from "./Form";
+// import FileForm from "./Form";
+import FileForm from "./FormikUploader"
 import './App.css';
 
 // import 'typeface-roboto';
