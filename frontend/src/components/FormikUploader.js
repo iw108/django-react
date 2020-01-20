@@ -11,13 +11,16 @@ import { withStyles } from '@material-ui/core/styles';
 import {Upload} from "tus-js-client";
 
 import Uploader from './Uploader';
-import FormButton from "./FormButton";
+
+import Button from '@material-ui/core/Button';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SettingsIcon from '@material-ui/icons/Settings';
+
+import HorizontalLabelPositionBelowStepper from './Stepper'
 
 
 const formSchema = Yup.object().shape({
@@ -62,12 +65,16 @@ const styles = theme => ({
     },
     '& .MuiExpansionPanel-root': {
       width: 400,
-      marginTop: 20,
-      marginBottom:20
     },
   },
+  parent: {
+    textAlign:'left',
+    width: 450,
+  },
+  backButton: {
+    marginRight: theme.spacing(1),
+  },
 });
-
 
 function ContainerNameField ({value, touched, error, handleChange, encrypted, required}) {
 
@@ -90,6 +97,7 @@ function ContainerNameField ({value, touched, error, handleChange, encrypted, re
           disabled={!(required)}
           required={required}
           style={{width: 350}}
+          fullwidth={true}
         />
       </div>
     </React.Fragment>
@@ -152,7 +160,7 @@ class FileForm extends Component {
 
   state = {
 
-    step: 1,
+    step: 0,
     fileList: [],
     settingsExpanded: false,
     recommendationDismissed: false,
@@ -184,15 +192,15 @@ class FileForm extends Component {
     },
   };
 
-  nextStep = () =>  {
+  handleNext = () =>  {
     this.setState({
       step: Math.min(this.state.step + 1, 2)
     })
   };
 
-  prevStep = () => {
+  handleBack = () => {
     this.setState({
-      step: Math.max(this.state.step - 1, 1)
+      step: Math.max(this.state.step - 1, 0)
     })
   };
 
@@ -265,7 +273,7 @@ class FileForm extends Component {
           ...touched,
           [field]: true,
         },
-        errors: {...errors}
+        errors: errors,
       };
 
       return {
@@ -412,94 +420,105 @@ class FileForm extends Component {
 
     return (
 
-          <form className={classes.root} noValidate onSubmit={this.handleSubmit}>
+    <div className={classes.parent}>
+      <HorizontalLabelPositionBelowStepper classname={classes.stepper} step={step}/>
 
-            <FormGroup>
+      <form className={classes.root} noValidate onSubmit={this.handleSubmit}>
 
-            {step === 1 && (
-              <React.Fragment>
-                <div>
-                  <FormControl>
-                    <Uploader
-                      handleDrop={this.handleDrop}
-                      fileList={fileList}
-                      handleUploadDelete={this.handleUploadDelete}
+        {step < 5 && (
+          <React.Fragment>
+            <div>
+              <FormControl>
+                <Uploader
+                  handleDrop={this.handleDrop}
+                  fileList={fileList}
+                  handleUploadDelete={this.handleUploadDelete}
+                />
+              </FormControl>
+            </div>
+
+            <div>
+              <DescriptionField
+              error={formControl.errors.description}
+              touched={formControl.touched.description}
+              value={formControl.values.value}
+              handleChange={this.handleChange}
+             />
+            </div>
+
+            <div>
+              <ExpansionPanel
+                expanded={this.state.settingsExpanded}
+                variant={"outlined"}
+
+                onChange={() => {
+                  this.setState(prevState => {
+                    return {
+                      prevState,
+                      settingsExpanded: !prevState.settingsExpanded,
+                      recommendationDismissed: (
+                        prevState.recommendationDismissed || (prevState.fileList.length >= 3)
+                      )
+                    }
+                  })
+                }}
+              >
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1d-content"
+                  id="panel1d-header">
+                   <div>
+                     <SettingsIcon /> Advanced Settings
+                   </div>
+                </ExpansionPanelSummary>
+
+                <ExpansionPanelDetails>
+                  <FormGroup className={classes.nested}>
+                  <div className={classes.nested}>
+                    < Switches
+                      container={formControl.values.container}
+                      encrypt={formControl.values.encrypt}
+                      handleSwitch={this.handleSwitch}
                     />
-                  </FormControl>
-                </div>
+                  </div>
 
-                <div>
-                  <DescriptionField
-                  error={formControl.errors.description}
-                  touched={formControl.touched.description}
-                  value={formControl.values.value}
-                  handleChange={this.handleChange}
-                 />
-                </div>
+                  <div>
+                    <ContainerNameField
+                      value={formControl.values.containerName}
+                      error={formControl.errors.containerName}
+                      touched={formControl.touched.containerName}
+                      encrypted={formControl.values.encrypt}
+                      required={formControl.values.encrypt || formControl.values.container}
+                      handleChange={this.handleChange}
+                    />
+                  </div>
+                    </FormGroup>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            </div>
 
-                <div>
-                  <ExpansionPanel
-                    expanded={this.state.settingsExpanded}
-                    variant={"outlined"}
+            <div>
+              <Button
+                disabled={step === 0}
+                onClick={this.handleBack}
+                className={classes.backButton}
+              >
+                Back
+              </Button>
 
-                    onChange={() => {
-                      this.setState(prevState => {
-                        return {
-                          prevState,
-                          settingsExpanded: !prevState.settingsExpanded,
-                          recommendationDismissed: (
-                            prevState.recommendationDismissed || (prevState.fileList.length >= 3)
-                          )
-                        }
-                      })
-                    }}
-                  >
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1d-content"
-                      id="panel1d-header">
-                       <div>
-                         <SettingsIcon /> Advanced Settings
-                       </div>
-                    </ExpansionPanelSummary>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.handleNext}>
+                {step === 1? 'Submit': 'Next'}
+              </Button>
+            </div>
 
-                    <ExpansionPanelDetails>
-                      <FormGroup className={classes.nested}>
-                      <div className={classes.nested}>
-                        < Switches
-                          container={formControl.values.container}
-                          encrypt={formControl.values.encrypt}
-                          handleSwitch={this.handleSwitch}
-                        />
-                      </div>
+          </React.Fragment>
+        )}
+      </form>
 
-                      <div>
-                        <ContainerNameField
-                          value={formControl.values.containerName}
-                          error={formControl.errors.containerName}
-                          touched={formControl.touched.containerName}
-                          encrypted={formControl.values.encrypt}
-                          required={formControl.values.encrypt || formControl.values.container}
-                          handleChange={this.handleChange}
-                        />
-                      </div>
-                        </FormGroup>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                </div>
-
-                <div>
-                  <FormButton
-                    type={"button"}
-                    text={"Back"}
-                    handleClick={this.prevStep}
-                  />
-                </div>
-              </React.Fragment>
-            )}
-
-            </FormGroup>
-          </form>
+    </div>
     );
   }
 }
