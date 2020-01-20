@@ -2,7 +2,7 @@
 import React from "react";
 
 import FileDropZone from "./Dropzone";
-import FileTable from "./Table";
+import SimpleTable from "./MaterialTable";
 
 
 function Uploader (props) {
@@ -18,9 +18,9 @@ function Uploader (props) {
 
         <div className={"row"}>
           <div className={"col-12"}>
-              <FileTable
+              <SimpleTable
                 fileList={props.fileList}
-                handleUploadDelete={props.handleUploadDelete}
+                handleDelete={props.handleUploadDelete}
               />
           </div>
         </div>

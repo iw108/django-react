@@ -65,7 +65,17 @@ const styles = theme => ({
     },
     '& .MuiExpansionPanel-root': {
       width: 400,
+      paddingLeft: 0,
     },
+    '& .MuiExpansionPanel-root': {
+      width: 400,
+      paddingLeft: 0,
+    },
+
+
+    '& .MuiTableContainer-root': {
+      boxShadow: 'none',
+    }
   },
   parent: {
     textAlign:'left',
@@ -97,7 +107,6 @@ function ContainerNameField ({value, touched, error, handleChange, encrypted, re
           disabled={!(required)}
           required={required}
           style={{width: 350}}
-          fullwidth={true}
         />
       </div>
     </React.Fragment>
@@ -164,6 +173,7 @@ class FileForm extends Component {
     fileList: [],
     settingsExpanded: false,
     recommendationDismissed: false,
+    duplicateFiles: false,
 
     formControl: {
       values: {
@@ -284,23 +294,27 @@ class FileForm extends Component {
   };
 
   handleDrop = (acceptedFiles, rejectedFiles) =>  {
-      const fileList = acceptedFiles.map(file => (
-        this.handleFileUpload(file)
-      ));
 
-      this.setState(prevState => {
+    const fileNames = this.state.fileList.map(({upload}) => upload.file.path);
 
-        let updatedState = {
-          ...prevState,
-          fileList: prevState.fileList.concat(fileList)
-        };
+    const newFiles = acceptedFiles
+      .filter(file => !fileNames.includes(file.path))
+      .map(file => this.handleFileUpload(file));
 
-        if (!updatedState.recommendationDismissed && updatedState.fileList.length >= 3) {
-          updatedState.settingsExpanded = true;
-          updatedState.formControl.values.container = true;
-        }
 
-        return updatedState;
+    this.setState(prevState => {
+      let updatedState = {
+        ...prevState,
+        fileList: prevState.fileList.concat(newFiles),
+        duplicateFiles: newFiles.length !== acceptedFiles.length,
+      };
+
+      if (!updatedState.recommendationDismissed && updatedState.fileList.length >= 3) {
+        updatedState.settingsExpanded = true;
+        updatedState.formControl.values.container = true;
+      }
+
+      return updatedState;
     });
   };
 
@@ -415,13 +429,19 @@ class FileForm extends Component {
 
   render () {
 
-    const { fileList, step, formControl } = this.state;
+    const { duplicateFiles, fileList, step, formControl } = this.state;
     const { classes } = this.props;
 
     return (
 
     <div className={classes.parent}>
       <HorizontalLabelPositionBelowStepper classname={classes.stepper} step={step}/>
+
+      {duplicateFiles && (
+        <div>
+          {"You can't upload multiple files with the same name. Please rename the file and try again"}
+        </div>
+      )}
 
       <form className={classes.root} noValidate onSubmit={this.handleSubmit}>
 

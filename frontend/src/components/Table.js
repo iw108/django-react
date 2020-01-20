@@ -9,15 +9,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 
 
 
-
 class DeleteButton extends Component {
 
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick() {
+  handleClick = () => {
     let {index, url} = this.props;
 
     const xhr = new window.XMLHttpRequest();
@@ -35,7 +29,7 @@ class DeleteButton extends Component {
     xhr.send(null);
 
     this.props.handleDelete(index)
-  }
+  };
 
   render() {
     return (

@@ -20,7 +20,6 @@ function getSteps() {
 
 export default function HorizontalLabelPositionBelowStepper({step}) {
 
-  const classes = useStyles();
   const steps = getSteps();
 
   return (
