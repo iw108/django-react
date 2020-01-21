@@ -13,13 +13,14 @@ import {Upload} from "tus-js-client";
 import Uploader from './Uploader';
 
 import Button from '@material-ui/core/Button';
-
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import SettingsIcon from '@material-ui/icons/Settings';
-
+import Collapse from '@material-ui/core/Collapse';
 import HorizontalLabelPositionBelowStepper from './Stepper'
 
 
@@ -61,18 +62,15 @@ const styles = theme => ({
       width: 400,
     },
     '& > *': {
-      margin: theme.spacing(2),
+      margin: theme.spacing(3),
     },
     '& .MuiExpansionPanel-root': {
       width: 400,
-      paddingLeft: 0,
     },
-    '& .MuiExpansionPanel-root': {
+    '& .MuiExpansionPanelDetails-root': {
       width: 400,
-      paddingLeft: 0,
+      boxShadow: 'none',
     },
-
-
     '& .MuiTableContainer-root': {
       boxShadow: 'none',
     }
@@ -105,13 +103,15 @@ function ContainerNameField ({value, touched, error, handleChange, encrypted, re
           variant={"outlined"}
           label={"Container name"}
           disabled={!(required)}
+
           required={required}
-          style={{width: 350}}
         />
       </div>
     </React.Fragment>
   )
 }
+
+
 
 
 function Switches({encrypt, container, handleSwitch}) {
@@ -458,42 +458,34 @@ class FileForm extends Component {
             </div>
 
             <div>
-              <DescriptionField
-              error={formControl.errors.description}
-              touched={formControl.touched.description}
-              value={formControl.values.value}
-              handleChange={this.handleChange}
-             />
-            </div>
-
-            <div>
-              <ExpansionPanel
-                expanded={this.state.settingsExpanded}
-                variant={"outlined"}
-
-                onChange={() => {
-                  this.setState(prevState => {
-                    return {
-                      prevState,
-                      settingsExpanded: !prevState.settingsExpanded,
-                      recommendationDismissed: (
-                        prevState.recommendationDismissed || (prevState.fileList.length >= 3)
-                      )
-                    }
-                  })
-                }}
+              <List
+                component="nav"
+                aria-labelledby="nested-list-subheader"
               >
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1d-content"
-                  id="panel1d-header">
-                   <div>
-                     <SettingsIcon /> Advanced Settings
-                   </div>
-                </ExpansionPanelSummary>
+                <ListItem
+                  button
+                  onClick={() => {
+                    this.setState(prevState => {
+                      return {
+                        prevState,
+                        settingsExpanded: !prevState.settingsExpanded,
+                        recommendationDismissed: (
+                          prevState.recommendationDismissed || (prevState.fileList.length >= 3)
+                        )
+                      }
+                    })
+                  }}
+                >
+                  <ListItemIcon>
+                    <SettingsIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Optional Settings" />
+                  {this.state.settingsExpanded ? <ExpandLess /> : <ExpandMore />}
+                </ListItem>
+              </List>
 
-                <ExpansionPanelDetails>
-                  <FormGroup className={classes.nested}>
+              <Collapse in={this.state.settingsExpanded} timeout="auto" unmountOnExit>
+                <FormGroup className={classes.nested}>
                   <div className={classes.nested}>
                     < Switches
                       container={formControl.values.container}
@@ -501,7 +493,6 @@ class FileForm extends Component {
                       handleSwitch={this.handleSwitch}
                     />
                   </div>
-
                   <div>
                     <ContainerNameField
                       value={formControl.values.containerName}
@@ -512,9 +503,8 @@ class FileForm extends Component {
                       handleChange={this.handleChange}
                     />
                   </div>
-                    </FormGroup>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
+                </FormGroup>
+              </Collapse>
             </div>
 
             <div>
