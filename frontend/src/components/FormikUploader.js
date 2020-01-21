@@ -21,7 +21,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Collapse from '@material-ui/core/Collapse';
-import HorizontalLabelPositionBelowStepper from './Stepper'
+import FormStepper from './Stepper'
 
 
 const formSchema = Yup.object().shape({
@@ -64,16 +64,6 @@ const styles = theme => ({
     '& > *': {
       margin: theme.spacing(3),
     },
-    '& .MuiExpansionPanel-root': {
-      width: 400,
-    },
-    '& .MuiExpansionPanelDetails-root': {
-      width: 400,
-      boxShadow: 'none',
-    },
-    '& .MuiTableContainer-root': {
-      boxShadow: 'none',
-    }
   },
   parent: {
     textAlign:'left',
@@ -103,15 +93,12 @@ function ContainerNameField ({value, touched, error, handleChange, encrypted, re
           variant={"outlined"}
           label={"Container name"}
           disabled={!(required)}
-
           required={required}
         />
       </div>
     </React.Fragment>
   )
 }
-
-
 
 
 function Switches({encrypt, container, handleSwitch}) {
@@ -435,7 +422,7 @@ class FileForm extends Component {
     return (
 
     <div className={classes.parent}>
-      <HorizontalLabelPositionBelowStepper classname={classes.stepper} step={step}/>
+      <FormStepper classname={classes.stepper} step={step}/>
 
       {duplicateFiles && (
         <div>
@@ -444,7 +431,6 @@ class FileForm extends Component {
       )}
 
       <form className={classes.root} noValidate onSubmit={this.handleSubmit}>
-
         {step < 5 && (
           <React.Fragment>
             <div>

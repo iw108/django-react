@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -18,7 +19,7 @@ function getSteps() {
   return ['Specify recipients', 'Upload file'];
 }
 
-export default function HorizontalLabelPositionBelowStepper({step}) {
+export default function FormStepper({step}) {
 
   const steps = getSteps();
 

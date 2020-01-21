@@ -63,6 +63,7 @@ class DeleteButton extends Component {
 const useStyles = makeStyles({
   container: {
     maxHeight: 300,
+    boxShadow: 'none',
   },
 });
 
