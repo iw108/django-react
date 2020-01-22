@@ -5,12 +5,11 @@ import axios from "axios";
 import * as Yup from 'yup';
 import {v4 as uuid} from 'uuid';
 
-import { FormGroup, FormControl, FormControlLabel, Switch, TextField} from '@material-ui/core';
+import {FormGroup, FormControl, FormControlLabel, Switch} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
 import {Upload} from "tus-js-client";
 
-import Uploader from './Uploader';
 
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
@@ -21,7 +20,20 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Collapse from '@material-ui/core/Collapse';
+
+
+import Uploader from './Uploader';
+import SingleSelect from "./SingleSelect";
+import DescriptionField from "./DescriptionField";
+import ContainerNameField from "./ContainerNameField";
+import Switches from "./Switches";
 import FormStepper from './Stepper'
+import TransferList from './UserSelection'
+
+
+
+import { _parseObject } from "./utils"
+import { organizations, projects } from "./data";
 
 
 const formSchema = Yup.object().shape({
@@ -33,18 +45,6 @@ const formSchema = Yup.object().shape({
     .max(10),
 });
 
-
-const camelToSnakeCase = str => (
-  str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
-);
-
-const _parseObject = obj => {
-  return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => {
-      return [camelToSnakeCase(key), value];
-    })
-  );
-};
 
 const getInitialValues = () => {
   return {
@@ -60,102 +60,25 @@ const styles = theme => ({
   root: {
     '& .MuiTextField-root': {
       width: 400,
+      marginBottom: theme.spacing(2),
     },
     '& > *': {
-      margin: theme.spacing(3),
+      marginTop: theme.spacing(2),
     },
   },
   parent: {
     textAlign:'left',
-    width: 450,
+    width: 400,
   },
   backButton: {
     marginRight: theme.spacing(1),
   },
 });
 
-function ContainerNameField ({value, touched, error, handleChange, encrypted, required}) {
 
-  const getContainerNameHelpText = () => {
-    const filler = (encrypted) ? "encrypted": "";
-    return (touched && error) || `* Name of the ${filler} container`
-  };
-
-  return (
-    <React.Fragment>
-      <div>
-        <TextField
-          error={!!(touched && error)}
-          helperText={getContainerNameHelpText()}
-          name="containerName"
-          value={value}
-          onChange={handleChange}
-          variant={"outlined"}
-          label={"Container name"}
-          disabled={!(required)}
-          required={required}
-        />
-      </div>
-    </React.Fragment>
-  )
-}
-
-
-function Switches({encrypt, container, handleSwitch}) {
-  return (
-    <React.Fragment>
-      <FormControl component={"fieldset"} label={'asdasdasdasd'}>
-        <FormControlLabel
-          label="Encrypt"
-          control={
-            <Switch
-              color="primary"
-              value="encrypt"
-              checked={encrypt}
-              onChange={handleSwitch}
-            />
-          }
-        />
-        <FormControlLabel
-          label="Container"
-          control={
-            <Switch
-              color="primary"
-              value="container"
-              checked={encrypt || container}
-              onChange={handleSwitch}
-              disabled={encrypt}
-            />
-          }
-        />
-      </FormControl>
-    </React.Fragment>
-  )
-}
-
-function DescriptionField ({value, touched, error, handleChange}) {
-  return (
-      <TextField
-      error={!!(touched && error)}
-      helperText={touched && error}
-      name="description"
-      value={value}
-      onChange={handleChange}
-      variant={"outlined"}
-      label="Description"
-      required
-      multiline
-      rowsMax="2"
-      inputProps={{ maxLength: 128 }}
-    />
-  )
-}
-
-
-class FileForm extends Component {
+class UploadForm extends Component {
 
   state = {
-
     step: 0,
     fileList: [],
     settingsExpanded: false,
@@ -165,6 +88,7 @@ class FileForm extends Component {
     formControl: {
       values: {
         formId: uuid(),
+        project: "",
         description: "",
         encrypt: false,
         container: false,
@@ -249,6 +173,18 @@ class FileForm extends Component {
           errors: errors,
         }
       };
+    })
+  };
+
+  handleExpansion = () => {
+    this.setState(prevState => {
+      return {
+        prevState,
+        settingsExpanded: !prevState.settingsExpanded,
+        recommendationDismissed: (
+          prevState.recommendationDismissed || (prevState.fileList.length >= 3)
+        )
+      }
     })
   };
 
@@ -424,15 +360,43 @@ class FileForm extends Component {
     <div className={classes.parent}>
       <FormStepper classname={classes.stepper} step={step}/>
 
-      {duplicateFiles && (
-        <div>
-          {"You can't upload multiple files with the same name. Please rename the file and try again"}
-        </div>
-      )}
-
       <form className={classes.root} noValidate onSubmit={this.handleSubmit}>
-        {step < 5 && (
+        {step === 0 && (
+          <FormControl>
+
+              <SingleSelect
+                inputOptions={organizations}
+                label={"Choose an Organization"}
+              />
+
+              <SingleSelect
+                inputOptions={projects}
+                label={"Choose a project"}
+              />
+
+              <FormControlLabel
+                label="Send to all project members"
+                control={
+                  <Switch
+                    color="primary"
+                    value="container"
+                    checked={true}
+                    onChange={() => {console.log('hellllloo')}}
+                  />
+                }
+              />
+
+             <TransferList />
+
+          </FormControl>
+        )}
+        {step === 1 && (
           <React.Fragment>
+            {duplicateFiles && (
+              <div>
+                {"You can't upload multiple files with the same name. Please rename the file and try again"}
+              </div>
+            )}
             <div>
               <FormControl>
                 <Uploader
@@ -450,17 +414,7 @@ class FileForm extends Component {
               >
                 <ListItem
                   button
-                  onClick={() => {
-                    this.setState(prevState => {
-                      return {
-                        prevState,
-                        settingsExpanded: !prevState.settingsExpanded,
-                        recommendationDismissed: (
-                          prevState.recommendationDismissed || (prevState.fileList.length >= 3)
-                        )
-                      }
-                    })
-                  }}
+                  onClick={this.handleExpansion}
                 >
                   <ListItemIcon>
                     <SettingsIcon />
@@ -493,25 +447,25 @@ class FileForm extends Component {
               </Collapse>
             </div>
 
-            <div>
-              <Button
-                disabled={step === 0}
-                onClick={this.handleBack}
-                className={classes.backButton}
-              >
-                Back
-              </Button>
-
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={this.handleNext}>
-                {step === 1? 'Submit': 'Next'}
-              </Button>
-            </div>
-
           </React.Fragment>
         )}
+
+        <div>
+          <Button
+            disabled={step === 0}
+            onClick={this.handleBack}
+            className={classes.backButton}
+          >
+            Back
+          </Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={this.handleNext}>
+            {step === 1? 'Submit': 'Next'}
+          </Button>
+        </div>
       </form>
 
     </div>
@@ -519,4 +473,4 @@ class FileForm extends Component {
   }
 }
 
-export default withStyles(styles)(FileForm);
+export default withStyles(styles)(UploadForm);

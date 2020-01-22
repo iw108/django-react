@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-// import FileForm from "./Form";
-import FileForm from "./FormikUploader"
+import UploadForm from "./UploadForm"
 import './App.css';
 
 // import 'typeface-roboto';
@@ -11,9 +10,10 @@ import './App.css';
 const App = () => (
   <div className="App">
     <div className={"container"}>
-      <FileForm />
+      <UploadForm />
     </div>
   </div>
 );
 
-ReactDOM.render(<App />, document.getElementById('app'));
+export default App;
+
