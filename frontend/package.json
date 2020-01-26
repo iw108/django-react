@@ -1,0 +1,49 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "front end for django react app",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iw108/django-react.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iw108/django-react/issues"
+  },
+  "homepage": "https://github.com/iw108/django-react#readme",
+  "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-react": "^7.8.3",
+    "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "css-loader": "^3.4.2",
+    "eslint": "^6.8.0",
+    "eslint-loader": "^3.0.3",
+    "file-loader": "^5.0.2",
+    "style-loader": "^1.1.3",
+    "webpack": "^4.41.5",
+    "webpack-bundle-tracker": "^0.4.3",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.9.0",
+    "@material-ui/icons": "^4.5.1",
+    "axios": "^0.19.2",
+    "prop-types": "^15.7.2",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-dropzone": "^10.2.1",
+    "tus-js-client": "^1.8.0",
+    "typeface-roboto": "0.0.75",
+    "uuid": "^3.4.0"
+  }
+}

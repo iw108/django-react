@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # third party apps
     'rest_framework',
     'django_file_form',
+    'webpack_loader',
 
     # local
     'file_management',
@@ -134,3 +135,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 FILE_FORM_UPLOAD_DIR = os.path.join(MEDIA_ROOT, 'temp_uploads')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'STATS_FILE': os.path.join(BASE_DIR, 'frontend', 'webpack-stats.json'),
+        'BUNDLE_DIR_NAME': 'frontend/webpack_bundles/'
+    }
+}

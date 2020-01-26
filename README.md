@@ -16,3 +16,18 @@ SECRET_KEY= <<YOUR SECRET KEY >>
 ```
 
 
+In order to create the react app:
+```
+cd frontend
+npm install
+npm run dev
+```
+
+
+In another terminal run:
+```
+python manage.py runserver
+```
+
+
+

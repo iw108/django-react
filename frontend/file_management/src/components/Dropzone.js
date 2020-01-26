@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import Dropzone from 'react-dropzone';
 import ControlPointIcon from '@material-ui/icons/ControlPoint'
+import Typography from '@material-ui/core/Typography';
 
 class FileDropZone extends Component {
 
@@ -29,7 +30,9 @@ class FileDropZone extends Component {
             <div className={"img-container"}>
               <figure>
                 <ControlPointIcon fontSize={"large"}/>
-                <figcaption> Drop your files or click here</figcaption>
+                <figcaption>
+                  <Typography> Drop your files or click here </Typography>
+                </figcaption>
               </figure>
             </div>
           </div>

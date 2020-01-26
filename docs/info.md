@@ -2,57 +2,71 @@
 
 ### Step by Step Guide for creating a React Django app
 
-The following provides a step-by-step guide documenting how to create a Django react app. The steps are pretty much
-entirely lifted from [here](https://www.valentinog.com/blog/drf/). Things have been documented here for my own 
-convenience. 
+The following provides a step-by-step guide documenting how to create a Django react app. The steps are heavily 
+inspired by [here](https://www.valentinog.com/blog/drf/). Things have been documented here for my own 
+convenience. In case I need to do this again in the future.
 
-### 1: Create a new app and implementing the basic architecture
-First, create a new app to house the react front end:
-```
-python manage.py startapp frontend
-```
+### 1: Initialise a location where the frontend will be created
 
-Make directory for React and static components:
+The idea is that there will be a single location where the React app(s) will be developed. To this end, 
+create a directory in the root django project for the frontend
 ```
-mkdir -p ./frontend/src/components
-mkdir -p ./frontend/{static,templates}/frontend
+mkdir frontend
 ```
 
-```components``` is where we will create the react app. ```static``` is where the 
-compiled javascript will end up. 
+The react apps that are made will live in individual directories within this folder and have the typical react
+structure.  In this project we are making a react app for the file_management django app. Therefore the structure will
+look something like this:
+``` bash
+|-- frontend
+|  |--file_management
+|    |-- src
+|      |-- components
+|      |-- index.js
+```
 
+Webpack will be used handle the bundling which will create the respective ```.js``` files in in django's ```static``` 
+folder.  In this manner the created files will be available to django templates. 
 
-### 2: Install Node packages
-
-In the root directory create a ```package.json``` file with the js requirements. To do this run:
+### 2: Initialise NPM
+After creating the above structure:
+```
+cd frontend
+```
+Then run:
 ``` 
 npm init -y
 ```
-The ```-y``` flag means the file is created automatically without any user input.
+The above command will create a ```package.json```. The ```-y``` flag will create the file without user input. 
 
-Now proceed to install requisite npm packages. First start with webpack:
+
+Now proceed to install requisite packages. First start with webpack:
 ``` 
-npm i -D webpack webpack-cli 
+npm i webpack webpack-cli webpack-bundle-tracker --save-dev
+
 ```
-NOTE: -D flag means install a development dependency.
-
-Now for Babel. This is required for transpiling javasript i.e. we can write modern javascript 
-and babel will handle translating to a form that is legible for older JS versions.
+Now for Babel. This is required for transpiling javascript: 
 ``` 
-npm i -D @babel/core babel-loader @babel/preset-env @babel/preset-react babel-plugin-transform-class-properties 
+npm i @babel/core babel-loader @babel/preset-env @babel/preset-react babel-plugin-transform-class-properties --save-dev
 ``` 
 
-Now for react:
+Now for the react base react packages:
 ``` 
-npm i react react-dom prop-types 
+npm i react react-dom prop-types --save
 ```
-```prop-types``` is used within react for checking the property types.
 
-### 3: Configuring things
+And finally for some linters:
+```
+npm i eslint eslint-loader babel-eslint --save-dev
+```
+
+### 3: Setting up the configurations
 
 Now create file in root
-- ``` touch .babelrc```
-In the file add the following:
+``` bash
+touch .babelrc
+```
+In this file add the following:
 ```
 {
     "presets": [
@@ -65,73 +79,83 @@ In the file add the following:
 }
 ```
 
-Now create another file in the root:
+``` bash
+touch .babelrc
+```
+In this file add the following:
+```
+{
+  "parser": "babel-eslint",
+  "rules": {}
+}
+```
+
+Now create the webpack configuration:
 - ``` touch webpack.config.js```
 To this file, add:
 ```javascript
+
+const path = require("path");
+let BundleTracker = require('webpack-bundle-tracker');
+
 module.exports = {
+  devtool: "source-map",
+  entry: {
+    file_management: ["./file_management/src/index.js"],
+  },
+  output: {
+      path: path.resolve(
+          __dirname,
+          "../static/frontend/webpack_bundles/"
+      ),
+      filename: "main.[hash].js"
+  },
   module: {
     rules: [
       {
+        enforce: 'pre',
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader"
-        }
-      }
+        loader: 'eslint-loader',
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+      },
     ]
-  }
+  },
+  plugins: [
+    new BundleTracker({
+      path: __dirname,
+      filename: './webpack-stats.json',
+    }),
+  ],
 };
 ```
 
 Now, go to the ```package.json ``` file and change the ```scripts``` so that it reads:
 ```json
-  "scripts" : {
-    "dev": "webpack --mode development --watch ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
-    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js"
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production"
   },
+
 ```
 The ``` --watch ``` flag for development means that you don't have to keep transpiling the js when you make changes
 during development
 
-###
- 
-Now make the following file:
-- ``` touch frontend/src/index.js```
-The file should contain the following:
-```javascript
-import App from './components/App';
-```
 
-Now make the following file:
-``` 
-touch frontend/components/App.js
-```
+### Setting up django
+Make sure that ```django_webpack_loader``` is installed and included in the installed apps.
+``` pip install django_webpack_loader ```
 
-Look at ```create-react-app ``` for inspiration about how this should be formatted.
-If using PyCharm, make sure that the editor is treating the file for JSX and not JS.
-
-We need to make a template for react to render in, i.e:
+Based on the above configuration, add to the settings file.
+```python
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'STATS_FILE': os.path.join(BASE_DIR, 'frontend', 'webpack-stats.json'),
+        'BUNDLE_DIR_NAME': 'frontend/webpack_bundles/'
+    }
+}
 ```
-touch frontend/templates/frontend/index.html  
-```
-A boilerplate can be used to create a generic HTML5 template. This template will be rendered by 
-Django, therefore you can use template tags. A ```div``` with an id needs to be included for React 
-to work. Add Js and Css links for bootstrap here if you are using that. 
-
-Create a view in ```frontend/views.py``` that utilizes  the newly made template and incorporate this view
-as per standard Django.  
-
-### Getting everything running
-Transpile the javascript:
-```javascript
-npm run dev
-```
-
-Then run the django server
-```
-python manage.py runserver
-```
-
-### Recommended reading
-https://www.valentinog.com/blog/drf/

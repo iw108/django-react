@@ -1,10 +1,7 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 
 import UploadForm from "./UploadForm"
 import './App.css';
-
-// import 'typeface-roboto';
 
 
 const App = () => (
